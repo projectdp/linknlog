@@ -23,7 +23,7 @@ send("USER " + nickname + " USING CUSTOM BOT")
 send("NICK " + nickname)
 
 con = lite.connect('linknlog.db')
-with con:        
+with con:
     cur = con.cursor()
     cur.execute("CREATE TABLE IF NOT EXISTS linknlog(Id INTEGER PRIMARY KEY, URL TEXT)")
 while 1:

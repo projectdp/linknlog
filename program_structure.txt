@@ -1,0 +1,88 @@
+README.md
+LICENSE.txt
+setup.py
+requirements.txt
+
+____________________________________________________________________________
+
+classes:
+
+def main()
+    connect to servers
+        lookup list of servers from configuration file
+        join channels on each server
+    reads data from server
+    reads data from channels
+    hide data by default
+
+def menu()
+    show list of servers
+        show each server channel per server (lettered)
+        show channel connect/disconnect status (numbered)
+        show username per server
+    hotkey commands
+        press : for command mode
+            :/reconnect - reconnects to all servers
+            :/join - join specific channel
+            :/leave - leaves specific channel
+            :/
+        press h for help
+        press tab to cycle servers
+        press 2c to connect to server 2
+
+
+state 1
+
+1. irc.freenode.net [ connected ]
+    *  [+] #test
+    *  [-] #place
+    *  [-] #thing
+
+2. quakenet.com [ disconnected ]
+    *  [-] #quake
+    *  [-] #team
+
+state 2
+
+* irc.freenode.net [ connected ]
+    1. [+] #test
+    2. [-] #place
+    3. [-] #thing
+
+* quakenet.com [ disconnected ]
+    1. [-] #quake
+    2. [-] #team
+
+
+
+def buffer
+    record url's in dictionaries
+    append to text file
+        required sort & delete duplicates
+    store in database
+
+
+
+functions:
+
+connect to a server
+    - needs configuration file
+        * servers list
+        * channels list
+
+connect to sqlite db
+    - needs configuration file
+        * sqlite db name
+
+
+
+
+____________________________________________________________________________
+
+
+
+
+
+
+
+
