@@ -1,4 +1,7 @@
-#!/usr/bin/python
+#!/usr/local/bin/python2.7
+
+# Replace the above string with your !/path/to/python
+# Test environment is on OpenBSD using python 2.7
 
 import socket
 import re
@@ -12,35 +15,109 @@ personNick = ""
 channels = ["#freenode", "#party"]
 sock = socket.socket()
 server = "irc.freenode.net"
-verified = [] 
-port = 6667 
+verified = []
+port = 6667
 
 def send(msg):
     sock.send(msg + "\r\n")
 
-sock.connect((server, port))
-send("USER " + nickname + " USING CUSTOM BOT")
-send("NICK " + nickname)
+# Find all PRIVMSG
+def check():
+    # Remove the colon character from the string.
+    no_colon = data.strip(':')
+    #print no_colon
 
-con = lite.connect('linknlog.db')
-with con:
-    cur = con.cursor()
-    cur.execute("CREATE TABLE IF NOT EXISTS linknlog(Id INTEGER PRIMARY KEY, URL TEXT)")
-while 1:
-    data = sock.recv(512)
-    print data
-    if data[0:4] == "PING":
-        send(data.replace("PING", "PONG"))
-#        send("MODE " + nickname + "+B")
-        for channel in channels:
-            send("JOIN " + channel)
-    links = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', data) 
-    print links
-    for link in links: 
-        cur.execute('SELECT * FROM linknlog WHERE URL=?;', [link])
-        dupecheck = cur.fetchone() 
-        if dupecheck is None:  
-            cur.execute('INSERT INTO linknlog VALUES(NULL,?);', [link])
+    # Create an entry for the user by removing the first colon
+    # and splitting at the first exclamation point.
+
+    user_split = re.split('!', no_colon)
+    discovery_user = user_split[0]
+    #print "User is", discovery_user,"\n"
+
+    # Split with spaces into a list.
+
+    data_list = re.split(' ', no_colon)
+    #print data_list
+
+    # Remove the long user location string.
+
+    data_list.pop(0)
+    #print data_list
+
+    # Remove garbage items less than 2 characters
+    for check in data_list:
+        if len(check) < 2:
+            data_list.remove(check)
+
+    # Find a list of the current channels in the data stream
+
+    chan_check = []
+    for check in data_list:
+        chan_check.append(re.findall('#\w+', check))
+    chan_check = filter(None, chan_check) 
+    #print chan_check
+
+    # Insert the user string into the data_list.
+    data_list.insert(0,discovery_user)
+    #print data_list
+
+    discovery_channel = chan_check[0]
+    #print discovery_channel
+
+    links = []
+    for link in data_list:
+        links.append(re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', link))
+    links = filter(None, links)
+
+    #print links
+    counter = 0
+    for link in links:
+        query_ready = discovery_user, discovery_channel[0], link[counter]
+        counter + 1
+        print query_ready
+        cur.execute('SELECT * FROM linknlog WHERE URL=?;', link)
+        dupecheck = cur.fetchone()
+
+        # Check for duplicate links:
+        if dupecheck is None: 
+            cur.execute('INSERT INTO linknlog VALUES(NULL,?,?,?);', query_ready)
             con.commit()
         else:
             print "Duplicate"
+
+
+
+def main():
+    global data
+    sock.connect((server, port))
+    send("USER " + nickname + " USING CUSTOM BOT")
+    send("NICK " + nickname)
+
+    # Sqlite3 Database creation/connection
+    global con
+    con = lite.connect('linknlog.db')
+    with con:
+        global cur
+        cur = con.cursor()
+        cur.execute("CREATE TABLE IF NOT EXISTS linknlog(Id INTEGER PRIMARY KEY, USER, CHANNEL, URL TEXT)")
+
+    while 1:
+        data = sock.recv(4096)
+        print data
+        # Keepalive connection
+        if data[0:4] == "PING":
+            send(data.replace("PING", "PONG"))
+            #send("MODE " + nickname + "+B")
+            for channel in channels:
+                send("JOIN " + channel)
+
+        if data.find("PRIVMSG") > 0:
+            #print(data.find("PRIVMSG"))
+            for channel in channels:
+                if data.find(channel) > 0:
+                    check()
+
+
+
+main()
+
