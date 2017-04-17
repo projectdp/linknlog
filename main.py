@@ -15,7 +15,6 @@ password = ""
 channels = ["#freenode", "#party"]
 sock = socket.socket()
 server = "irc.freenode.net"
-verified = []
 port = 6667
 
 def send(msg):
@@ -110,20 +109,20 @@ def main():
         cur.execute("CREATE TABLE IF NOT EXISTS linknlog(Id INTEGER PRIMARY KEY, USER, CHANNEL, URL TEXT)")
 
     while 1:
-        data = sock.recv(4096)
+        data = sock.recv(1024)
         print data
         # Keepalive connection
         if data[0:4] == "PING":
             send(data.replace("PING", "PONG"))
             #send("MODE " + nickname + "+B")
-        for channel in channels:
-            send("JOIN " + channel)
+            for channel in channels:
+                send("JOIN " + channel)
 
         if data.find("PRIVMSG") > 0:
             #print(data.find("PRIVMSG"))
             for channel in channels:
                 if data.find(channel) > 0:
-                    check(
-)
+                    check()
+
 main()
 
