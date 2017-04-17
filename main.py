@@ -11,11 +11,13 @@ import sqlite3 as lite
 
 bot_owner = "projectdp"
 nickname = "bot_name"
+password = ""
 personNick = ""
 channels = ["#freenode", "#party"]
 sock = socket.socket()
 server = "irc.freenode.net"
 verified = []
+
 port = 6667
 
 def send(msg):
@@ -89,11 +91,18 @@ def check():
 
 def main():
     global data
-    sock.connect((server, port))
-    send("USER " + nickname + " USING CUSTOM BOT")
-    send("NICK " + nickname)
+
+    # Main IRC connection / exception handling
+    try:
+        sock.connect((server, port))
+        send("USER " + nickname + " USING CUSTOM BOT")
+        send("NICK " + nickname)
+        send("NICKSERV IDENTIFY " + password)
+    except socket.error, exc:
+        print "Caught exception socket.error : %s" % exc
 
     # Sqlite3 Database creation/connection
+
     global con
     con = lite.connect('linknlog.db')
     with con:
