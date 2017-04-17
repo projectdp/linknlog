@@ -9,7 +9,7 @@ classes:
 
 def main()
     connect to servers
-        lookup list of servers from configuration file
+        lookup list of servers from configuration file => DONE
         join channels on each server
     reads data from server
     reads data from channels
@@ -53,22 +53,18 @@ state 2
     1. [-] #quake
     2. [-] #team
 
-
-
 def buffer
-    record url's in dictionaries
+    record url's in dictionaries  => DONE
     append to text file
         required sort & delete duplicates
-    store in database
-
-
+    store in database  => DONE
 
 functions:
 
-connect to a server
-    - needs configuration file
-        * servers list
-        * channels list
+connect to a server  => DONE
+    - needs configuration file  => DONE
+        * servers list  => DONE
+        * channels list  => DONE
 
 connect to sqlite db
     - needs configuration file
