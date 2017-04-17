@@ -12,12 +12,10 @@ import sqlite3 as lite
 bot_owner = "projectdp"
 nickname = "bot_name"
 password = ""
-personNick = ""
 channels = ["#freenode", "#party"]
 sock = socket.socket()
 server = "irc.freenode.net"
 verified = []
-
 port = 6667
 
 def send(msg):
@@ -34,6 +32,8 @@ def check():
 
     user_split = re.split('!', no_colon)
     discovery_user = user_split[0]
+    if len(discovery_user) > 16:
+        return
     #print "User is", discovery_user,"\n"
 
     # Split with spaces into a list.
@@ -55,8 +55,9 @@ def check():
 
     chan_check = []
     for check in data_list:
-        chan_check.append(re.findall('#\w+', check))
-    chan_check = filter(None, chan_check) 
+        for channel in channels:
+            chan_check.append(re.findall(channel, check))
+    chan_check = filter(None, chan_check)  
     #print chan_check
 
     # Insert the user string into the data_list.
@@ -76,7 +77,6 @@ def check():
     for link in links:
         query_ready = discovery_user, discovery_channel[0], link[counter]
         counter + 1
-        print query_ready
         cur.execute('SELECT * FROM linknlog WHERE URL=?;', link)
         dupecheck = cur.fetchone()
 
@@ -84,14 +84,13 @@ def check():
         if dupecheck is None: 
             cur.execute('INSERT INTO linknlog VALUES(NULL,?,?,?);', query_ready)
             con.commit()
+            print "STATUS: Committed Link:", str(query_ready)
         else:
-            print "Duplicate"
-
-
+            print "STATUS: Duplicate Link."
+            return
 
 def main():
     global data
-
     # Main IRC connection / exception handling
     try:
         sock.connect((server, port))
@@ -117,16 +116,14 @@ def main():
         if data[0:4] == "PING":
             send(data.replace("PING", "PONG"))
             #send("MODE " + nickname + "+B")
-            for channel in channels:
-                send("JOIN " + channel)
+        for channel in channels:
+            send("JOIN " + channel)
 
         if data.find("PRIVMSG") > 0:
             #print(data.find("PRIVMSG"))
             for channel in channels:
                 if data.find(channel) > 0:
-                    check()
-
-
-
+                    check(
+)
 main()
 
