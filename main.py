@@ -8,14 +8,22 @@ import re
 import os
 import sys
 import sqlite3 as lite
+from ConfigParser import SafeConfigParser
 
-bot_owner = "projectdp"
-nickname = "bot_name"
-password = ""
-channels = ["#freenode", "#party"]
 sock = socket.socket()
-server = "irc.freenode.net"
-port = 6667
+
+def srv_conn(server, port, nickname, password):
+    # Main IRC connection / exception handling
+    try:
+        sock.connect((server, port))
+        send("USER " + nickname + " USING CUSTOM BOT")
+        send("NICK " + nickname)
+        #send("NICKSERV IDENTIFY " + password)
+        print "CONNECT " + server, port
+        print "NICK " + nickname
+        print "/MSG NICKSERV IDENTIFY " + password
+    except socket.error, exc:
+        print "Caught exception socket.error : %s" % exc
 
 def send(msg):
     sock.send(msg + "\r\n")
@@ -90,14 +98,35 @@ def check():
 
 def main():
     global data
-    # Main IRC connection / exception handling
-    try:
-        sock.connect((server, port))
-        send("USER " + nickname + " USING CUSTOM BOT")
-        send("NICK " + nickname)
-        send("NICKSERV IDENTIFY " + password)
-    except socket.error, exc:
-        print "Caught exception socket.error : %s" % exc
+
+    # Parse configuration file
+
+    parser = SafeConfigParser()
+    parser.read('config/config.txt')
+
+    bot_owner = parser.get('Bot_config','bot_owner')
+    nickname = parser.get('Bot_config','nickname')
+    sections = []
+    for section_name in parser.sections():
+        sections.append(section_name)
+        #print sections
+        #print '  Options:', parser.options(section_name)
+        if section_name != "Bot_config":
+            var = []
+            for name, value in parser.items(section_name):
+            #print '  %s = %s' % (name, value)
+                c = 0
+                var.append(value)
+                c + 1
+            #print var
+            server = var[0]
+            port = int(var[1])
+            nickname = var[2]
+            password = var[3]
+            clean = var[4].replace(' ','')
+            channels = clean.split(",")
+            print server, port, nickname, password, channels
+            srv_conn(server, port, nickname, password)
 
     # Sqlite3 Database creation/connection
 
@@ -125,4 +154,3 @@ def main():
                     check()
 
 main()
-
