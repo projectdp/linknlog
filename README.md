@@ -8,6 +8,7 @@ linknlog is easy to configure, just register a bot name on the IRC server, and r
 This bot is not daemonized, so it's best if you use a multiplexer like tmux or screen. This bot also has no in-channel controls.
 
 04/19/2017 06:30:25 PM
+
 News: I am trying to figure out how to automatically reconnect. I keep getting an error:
 
 <pre>
