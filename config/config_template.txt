@@ -1,0 +1,9 @@
+[Bot_config]
+bot_owner = projectdp
+
+[freenode]
+freenode.addresses = irc.freenode.net
+freenode.port = 6667
+freenode.nicks = bot_name
+freenode.password =
+freenode.channels = #freenode
