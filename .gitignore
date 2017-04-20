@@ -4,5 +4,6 @@
 
 # Distribution / packaging #
 ############################
-config/
+config/config.txt
+config/config.backup.txt
 test-cases/
